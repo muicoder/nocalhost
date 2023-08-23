@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -eu
 
-VERSION=${VERSION:-$(git describe 2>/dev/null | sed 's/refs\/tags\///' | sed 's/\(.*\)-.*/\1/' | sed 's/-[0-9]*$//' || true)}
+#VERSION=${VERSION:-$(git describe 2>/dev/null | sed 's/refs\/tags\///' | sed 's/\(.*\)-.*/\1/' | sed 's/-[0-9]*$//' || true)}
+VERSION=v0.6.999
 GITCOMMIT=`git describe --match=NeVeRmAtCh --always --abbrev=40`
 DEVGITCOMMIT=`git rev-parse HEAD`
-BUILDTIME=`date +"%Y-%m-%dT%H:%M:%SZ"`
+#BUILDTIME=`date +"%Y-%m-%dT%H:%M:%SZ"`
+BUILDTIME=2006-01-02T15:04:05Z
 BRANCH=${GITHUB_HEAD_REF:-$(git rev-parse --abbrev-ref HEAD)}
 
 GOOS="${GOOS:-$(go env GOHOSTOS)}"

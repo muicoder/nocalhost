@@ -54,7 +54,7 @@ func AddContainer(spec *v1.PodSpec, c *PodRouteConfig) {
 				"iptables -t nat -A POSTROUTING ! -p icmp -j MASQUERADE;" +
 				"sysctl -w net.ipv4.conf.all.route_localnet=1;" +
 				"iptables -t nat -A OUTPUT -o lo ! -p icmp -j DNAT --to-destination " + c.LocalTunIP + ";" +
-				"nhctl vpn serve -L 'tun://0.0.0.0:8421/" + c.TrafficManagerRealIP + ":8421?net=" + c.InboundPodTunIP + "&route=" + c.Route + "' --debug=true",
+				"nhctl vpn serve -L 'tun://0.0.0.0:8421/" + c.TrafficManagerRealIP + ":8421?net=" + c.InboundPodTunIP + "&route=" + c.Route,
 		},
 		SecurityContext: &v1.SecurityContext{
 			Capabilities: &v1.Capabilities{

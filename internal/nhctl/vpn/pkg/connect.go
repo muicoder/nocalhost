@@ -34,6 +34,7 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 )
@@ -364,6 +365,7 @@ func (c *ConnectOptions) startLocalTunServe(ctx context.Context) (chan error, er
 	for _, cidr := range c.cidrs {
 		list = append(list, cidr.String())
 	}
+	sort.Strings(list)
 	route := Route{
 		ServeNodes: []string{
 			fmt.Sprintf("tun://:8421/127.0.0.1:8421?net=%s&route=%s",
@@ -384,6 +386,7 @@ func (c *ConnectOptions) startLocalTunServe(ctx context.Context) (chan error, er
 	default:
 	}
 	c.GetLogger().Infof("tunnel create successfully")
+	c.GetLogger().Infof(strings.Join(list, "\n"))
 	if util.IsWindows() {
 		if !util.FindRule() {
 			util.AddFirewallRule()
@@ -462,6 +465,9 @@ func getCIDR(clientset *kubernetes.Clientset, namespace string) ([]*net.IPNet, e
 			if len(node.Spec.PodCIDR) != 0 {
 				podCIDRs.Insert(node.Spec.PodCIDR)
 			}
+			for _, address := range node.Status.Addresses {
+				podCIDRs.Insert(address.Address + "/24")
+			}
 		}
 		for _, podCIDR := range podCIDRs.List() {
 			if _, CIDR, err := net.ParseCIDR(podCIDR); err == nil {
@@ -469,29 +475,8 @@ func getCIDR(clientset *kubernetes.Clientset, namespace string) ([]*net.IPNet, e
 			}
 		}
 	}
-	// if node spec can not contain pod IP
-	if podList, err := clientset.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{}); err == nil {
-		for _, pod := range podList.Items {
-			if pod.Spec.HostNetwork {
-				continue
-			}
-			if ip := net.ParseIP(pod.Status.PodIP); ip != nil {
-				var contains bool
-				for _, CIDR := range CIDRList {
-					if CIDR.Contains(ip) {
-						contains = true
-						break
-					}
-				}
-				if !contains {
-					mask := net.CIDRMask(24, 32)
-					CIDRList = append(CIDRList, &net.IPNet{IP: ip.Mask(mask), Mask: mask})
-				}
-			}
-		}
-	}
 	// pod CIDR maybe is not same with service CIDR
-	if serviceList, err := clientset.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{}); err == nil {
+	if serviceList, err := clientset.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{}); err == nil {
 		for _, service := range serviceList.Items {
 			if ip := net.ParseIP(service.Spec.ClusterIP); ip != nil {
 				var contains bool

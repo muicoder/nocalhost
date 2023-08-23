@@ -67,7 +67,8 @@ func (s *SyncthingInstaller) InstallIfNeeded() (bool, error) {
 	// first try to download the version matched Version
 	// then try the version matched commit id
 	syncthingCandidate, needCopy := s.getCompatibilityByVersionAndCommitId()
-	if !needCopy {
+	log.Infof("syncthingCandidate,", syncthingCandidate, needCopy)
+	if true {
 		return false, nil
 	}
 

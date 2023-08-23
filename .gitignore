@@ -25,6 +25,7 @@ Chart.lock
 /cmd/nhctl/utils/darwin/*
 /cmd/nhctl/build/
 /cmd/nhctl/sync/
+/internal/nhctl/syncthing/bin/syncthing_*64
 sync_for_test
 
 # nocalhost-api

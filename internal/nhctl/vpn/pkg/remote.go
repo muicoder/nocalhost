@@ -51,7 +51,7 @@ func createOutboundRouterPodIfNecessary(
 		args = append(args, fmt.Sprintf("iptables -t nat -A POSTROUTING -s %s -o eth0 -j MASQUERADE", ipNet.String()))
 	}
 	args = append(args,
-		fmt.Sprintf("nhctl vpn serve -L tcp://:10800 -L tun://:8421?net=%s --debug=true", serverIP.String()))
+		fmt.Sprintf("nhctl vpn serve -L tcp://:10800 -L tun://:8421?net=%s", serverIP.String()))
 
 	t := true
 	zero := int64(0)
